@@ -12,10 +12,8 @@ cursor.execute("""
 conn.commit()
 
 
-
 def studentList():
     def listStudents():
-        
         print('\nStudent list:')
         cursor.execute("SELECT name FROM students ORDER BY name")
         students = cursor.fetchall()
@@ -26,62 +24,77 @@ def studentList():
         print("\n Students List:")
         for index, (name,)in  enumerate(students, start = 1):
             print(f"{index}. {name}")
-        print('-' * 8)
 
     def searchStudents():
-        search = input('Enter the name of the student to search: ').strip()
-        if not search:
-            print('\nName cannot be empty.\n')
-            return
-
-        name = search.capitalize()
-        
-        cursor.execute(
-            "SELECT 1 FROM students WHERE name = ?", (name,)
-        )
-        if cursor.fetchone():
-            print(f'\n{name} is in the list and DB.\n')
-        else:
-            print(f'\n{name} is not in the DB')
-
+        try: 
+            while True:
+                search = input('Enter the name of the student to search: ').strip()
+                if not search:
+                    print('\nName cannot be empty.\n')
+                    return
+                elif search.capitalize() == "Exit":
+                    return
+                name = search.capitalize()
+                
+                cursor.execute(
+                    "SELECT 1 FROM students WHERE name = ?", (name,)
+                )
+                if cursor.fetchone():
+                    print(f'\n{name} is in the list and DB.\n')
+                else:
+                    print(f'\n{name} is not in the DB')
+        except KeyboardInterrupt:
+            studentList()
 
     def addStudents():
-        nameAdd = input('Enter the name of the student: ').strip()
-        if not nameAdd:
-            print('\nName cannot be empty.\n')
-            return
-
-        name = nameAdd.capitalize()
         try: 
-            cursor.execute("INSERT INTO students (name) VALUES (?)", (name,))
-            conn.commit()
-            print(f'\n{name} has been added to the list and DB.\n')
-        except sqlite3.IntegrityError:
-            print(f'\n{name} is already in the list.\n')
+            while True:
+                nameAdd = input('Enter the name of the student: ').strip()
+                if not nameAdd:
+                    print('\nName cannot be empty.\n')
+                    return
+                elif nameAdd.capitalize() == "Exit":
+                    return
+
+                name = nameAdd.capitalize()
+                try: 
+                    cursor.execute("INSERT INTO students (name) VALUES (?)", (name,))
+                    conn.commit()
+                    print(f'\n{name} has been added to the list and DB.\n')
+                except sqlite3.IntegrityError:
+                    print(f'\n{name} is already in the list.\n')
+        except KeyboardInterrupt:
+            studentList()
 
     def removeStudents():
-        toRemove = input('Enter the name of the student to remove: ').strip()
-        if not toRemove:
-            print('\nName cannot be empty.\n')
-            return
+        try:
+            while True:
+                toRemove = input('Enter the name of the student to remove: ').strip()
+                if not toRemove:
+                    print('\nName cannot be empty.\n')
+                    return
+                elif toRemove.capitalize() == "Exit":
+                    return
 
-        name = toRemove.capitalize()
-        cursor.execute("DELETE FROM students WHERE name = ?", (name,))
-        if cursor.rowcount > 0:
-            conn.commit()
-            print(f'\n{name} has been removed from the list.\n')
-        else:
-            print(f'\n{name} is not in the list.\n')
+                name = toRemove.capitalize()
+                cursor.execute("DELETE FROM students WHERE name = ?", (name,))
+                if cursor.rowcount > 0:
+                    conn.commit()
+                    print(f'\n{name} has been removed from the list.\n')
+                else:
+                    print(f'\n{name} is not in the list.\n')
+        except KeyboardInterrupt :
+            studentList()
         
-
     try:
         while True:
-            menu = (
+            menu = ('\n'
                 '1. List Students\n'
                 '2. Search Students\n'
                 '3. Add Students\n'
                 '4. Remove Students\n'
                 '5. Exit'
+                '\n'
             )
             print(menu)
             userInput = input('Choose an option: ').strip()
@@ -94,7 +107,7 @@ def studentList():
                 addStudents()
             elif userInput == '4':
                 removeStudents()
-            elif userInput == '5':
+            elif userInput == '5' or userInput == 'exit':
                 conn.close()
                 print('Exiting the program.')
                 break
