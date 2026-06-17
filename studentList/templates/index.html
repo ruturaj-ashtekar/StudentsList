@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student ERP</title>
+</head>
+<body>
+
+<h1>Student ERP</h1>
+
+{% with messages = get_flashed_messages() %}
+    {% for message in messages %}
+        <p>{{ message }}</p>
+    {% endfor %}
+{% endwith %}
+
+<form action="/add" method="POST">
+    <input
+        type="text"
+        name="name"
+        placeholder="Student Name"
+        required
+    >
+    <button type="submit">
+        Add Student
+    </button>
+</form>
+
+<br>
+
+<form action="/" method="GET">
+    <input
+        type="text"
+        name="search"
+        placeholder="Search Student"
+        value="{{ search }}"
+    >
+    <button type="submit">
+        Search
+    </button>
+</form>
+
+<br>
+
+<a href="/">Show All Students</a>
+
+<hr>
+
+<table border="1" cellpadding="5">
+
+<tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>Action</th>
+</tr>
+
+{% for student in students %}
+
+<tr>
+    <td>{{ student.id }}</td>
+    <td>{{ student.name }}</td>
+
+    <td>
+        <a href="/delete/{{ student.id }}">
+            Delete
+        </a>
+    </td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+</body>
+</html>
