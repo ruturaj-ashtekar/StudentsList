@@ -6,7 +6,8 @@ from flask import (
     url_for,
     flash
 )
-
+import logging
+import sqlite3
 from database import (
     initialize_database,
     listStudents,
@@ -15,6 +16,11 @@ from database import (
     delStudent
 )
 
+logging.basicConfig(
+    filename='programLogs.log',
+    level = logging.INFO,
+    format = '%(asctime)s - %(levelname)s - %(message)s'
+)
 app = Flask(__name__)
 app.secret_key = "student_erp_secret"
 
@@ -22,61 +28,176 @@ app.secret_key = "student_erp_secret"
 initialize_database()
 
 
-@app.route("/", methods=["GET"])
+@app.route("/")
 def home():
-    search = request.args.get("search", "").strip()
-
-    if search:
-        students = searchStudent(search)
-    else:
+    try:
         students = listStudents()
+    except Exception as e:
+        logging.exception(e)
+        flash(f"Error loading students: {e}")
+        students = []
 
     return render_template(
         "index.html",
-        students=students,
-        search=search
+        students=students
     )
 
 
 @app.route("/add", methods=["POST"])
 def add():
+
     name = request.form.get("name", "").strip()
 
     if not name:
-        flash("Student name cannot be empty.")
+        flash("Name cannot be empty.")
         return redirect(url_for("home"))
 
     try:
         addStudent(name.capitalize())
-        flash(f"{name.capitalize()} added successfully.")
+
+        logging.info(
+            f"Student {name.capitalize()} added."
+        )
+
+        flash(
+            f"{name.capitalize()} has been added."
+        )
+
+    except sqlite3.IntegrityError:
+
+        logging.warning(
+            f"Duplicate student attempted: {name}"
+        )
+
+        flash(
+            f"{name.capitalize()} already exists."
+        )
+
+    except sqlite3.DatabaseError as e:
+
+        logging.exception(e)
+
+        flash(
+            f"Database error: {e}"
+        )
+
     except Exception as e:
-        flash(str(e))
+
+        logging.exception(e)
+
+        flash(
+            f"Unexpected error: {e}"
+        )
 
     return redirect(url_for("home"))
 
 
-@app.route("/delete/<int:student_id>")
-def delete(student_id):
+@app.route("/search")
+def search():
+
+    query = request.args.get(
+        "search",
+        ""
+    ).strip()
+
+    if not query:
+
+        flash(
+            "Name cannot be empty."
+        )
+
+        return redirect(
+            url_for("home")
+        )
+
     try:
-        delStudent(student_id)
-        flash("Student removed successfully.")
+
+        result = searchStudent(
+            query.capitalize()
+        )
+
+        logging.info(
+            f"Student searched: {query}"
+        )
+
+        return render_template(
+            "index.html",
+            students=result,
+            search=query
+        )
+
+    except sqlite3.DatabaseError as e:
+
+        logging.exception(e)
+
+        flash(
+            f"Database error: {e}"
+        )
+
     except Exception as e:
-        flash(str(e))
 
-    return redirect(url_for("home"))
+        logging.exception(e)
+
+        flash(
+            f"Unexpected error: {e}"
+        )
+
+    return redirect(
+        url_for("home")
+    )
 
 
-@app.errorhandler(404)
-def page_not_found(error):
-    return (
-        "<h1>404</h1><p>Page not found.</p>",
-        404
+@app.route(
+    "/delete/<student_name>"
+)
+def delete(student_name):
+
+    try:
+
+        deleted = delStudent(
+            student_name.capitalize()
+        )
+
+        if deleted:
+
+            logging.info(
+                f"Student removed: {student_name}"
+            )
+
+            flash(
+                f"{student_name.capitalize()} removed."
+            )
+
+        else:
+
+            flash(
+                f"{student_name.capitalize()} not found."
+            )
+
+    except sqlite3.DatabaseError as e:
+
+        logging.exception(e)
+
+        flash(
+            f"Database error: {e}"
+        )
+
+    except Exception as e:
+
+        logging.exception(e)
+
+        flash(
+            f"Unexpected error: {e}"
+        )
+
+    return redirect(
+        url_for("home")
     )
 
 
 if __name__ == "__main__":
     app.run(
-        debug=True,
-        host="127.0.0.1",
+        debug=False,
+        host="0.0.0.0",
         port=5000
     )

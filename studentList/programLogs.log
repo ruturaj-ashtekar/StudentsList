@@ -7,3 +7,29 @@
 2026-06-16 19:18:19,071 - INFO - name: {name} is added to the List/DB
 2026-06-16 19:28:39,370 - INFO - name:Ruturaj was searched
 2026-06-16 19:28:46,887 - INFO - name:Manisha was searched
+2026-06-18 18:36:10,546 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2026-06-18 18:36:10,552 - INFO - [33mPress CTRL+C to quit[0m
+2026-06-18 18:36:10,552 - INFO -  * Restarting with stat
+2026-06-18 18:36:10,637 - WARNING -  * Debugger is active!
+2026-06-18 18:36:10,638 - INFO -  * Debugger PIN: 145-277-805
+2026-06-18 18:36:54,797 - INFO -  * Detected change in '/home/rutu/projects/python/studentList/app.py', reloading
+2026-06-18 18:36:54,828 - INFO -  * Restarting with stat
+2026-06-18 18:36:54,914 - WARNING -  * Debugger is active!
+2026-06-18 18:36:54,916 - INFO -  * Debugger PIN: 145-277-805
+2026-06-18 18:37:23,175 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2026-06-18 18:37:23,175 - INFO - [33mPress CTRL+C to quit[0m
+2026-06-18 18:37:23,175 - INFO -  * Restarting with stat
+2026-06-18 18:37:23,263 - WARNING -  * Debugger is active!
+2026-06-18 18:37:23,264 - INFO -  * Debugger PIN: 145-277-805
+2026-06-18 18:39:26,051 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.0.101:5000
+2026-06-18 18:39:26,051 - INFO - [33mPress CTRL+C to quit[0m
+2026-06-18 18:56:39,507 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.0.101:5000
+2026-06-18 18:56:39,507 - INFO - [33mPress CTRL+C to quit[0m
