@@ -6,34 +6,28 @@ from flask import (
     url_for,
     flash
 )
-import logging
-import sqlite3
+
 from database import (
     initialize_database,
     listStudents,
-    searchStudent,
     addStudent,
+    searchStudent,
     delStudent
 )
 
-logging.basicConfig(
-    filename='programLogs.log',
-    level = logging.INFO,
-    format = '%(asctime)s - %(levelname)s - %(message)s'
-)
 app = Flask(__name__)
-app.secret_key = "student_erp_secret"
+app.secret_key = "student_secret"
 
-# Create database/table if not exists
 initialize_database()
 
 
 @app.route("/")
 def home():
+
     try:
         students = listStudents()
+
     except Exception as e:
-        logging.exception(e)
         flash(f"Error loading students: {e}")
         students = []
 
@@ -49,45 +43,15 @@ def add():
     name = request.form.get("name", "").strip()
 
     if not name:
-        flash("Name cannot be empty.")
+        flash("Name cannot be empty")
         return redirect(url_for("home"))
 
     try:
         addStudent(name.capitalize())
-
-        logging.info(
-            f"Student {name.capitalize()} added."
-        )
-
-        flash(
-            f"{name.capitalize()} has been added."
-        )
-
-    except sqlite3.IntegrityError:
-
-        logging.warning(
-            f"Duplicate student attempted: {name}"
-        )
-
-        flash(
-            f"{name.capitalize()} already exists."
-        )
-
-    except sqlite3.DatabaseError as e:
-
-        logging.exception(e)
-
-        flash(
-            f"Database error: {e}"
-        )
+        flash("Student added successfully")
 
     except Exception as e:
-
-        logging.exception(e)
-
-        flash(
-            f"Unexpected error: {e}"
-        )
+        flash(str(e))
 
     return redirect(url_for("home"))
 
@@ -95,109 +59,43 @@ def add():
 @app.route("/search")
 def search():
 
-    query = request.args.get(
-        "search",
-        ""
-    ).strip()
+    name = request.args.get("name", "").strip()
 
-    if not query:
+    if not name:
+        flash("Name cannot be empty")
+        return redirect(url_for("home"))
 
-        flash(
-            "Name cannot be empty."
-        )
+    student = searchStudent(name.capitalize())
 
-        return redirect(
-            url_for("home")
-        )
-
-    try:
-
-        result = searchStudent(
-            query.capitalize()
-        )
-
-        logging.info(
-            f"Student searched: {query}"
-        )
-
-        return render_template(
-            "index.html",
-            students=result,
-            search=query
-        )
-
-    except sqlite3.DatabaseError as e:
-
-        logging.exception(e)
-
-        flash(
-            f"Database error: {e}"
-        )
-
-    except Exception as e:
-
-        logging.exception(e)
-
-        flash(
-            f"Unexpected error: {e}"
-        )
-
-    return redirect(
-        url_for("home")
+    return render_template(
+        "search_result.html",
+        student=student,
+        search_term=name
     )
 
 
-@app.route(
-    "/delete/<student_name>"
-)
-def delete(student_name):
+@app.route("/delete/<int:student_id>")
+def delete(student_id):
 
     try:
-
-        deleted = delStudent(
-            student_name.capitalize()
-        )
-
-        if deleted:
-
-            logging.info(
-                f"Student removed: {student_name}"
-            )
-
-            flash(
-                f"{student_name.capitalize()} removed."
-            )
-
-        else:
-
-            flash(
-                f"{student_name.capitalize()} not found."
-            )
-
-    except sqlite3.DatabaseError as e:
-
-        logging.exception(e)
-
-        flash(
-            f"Database error: {e}"
-        )
+        delStudent(student_id)
+        flash("Student deleted successfully")
 
     except Exception as e:
+        flash(str(e))
 
-        logging.exception(e)
+    return redirect(url_for("home"))
 
-        flash(
-            f"Unexpected error: {e}"
-        )
 
-    return redirect(
-        url_for("home")
-    )
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template("404.html"), 404
+
+
+@app.errorhandler(500)
+def server_error(error):
+    return render_template("500.html"), 500
 
 
 if __name__ == "__main__":
-    app.run(
-        debug=False,
-        host="0.0.0.0",
-        port=5000
-    )
+    app.run(debug=True)
