@@ -1,52 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Student Management System</title>
+    <title>Search Result</title>
 </head>
 <body>
 
-<h1>Student Management System</h1>
+<h1>Search Result</h1>
 
 {% for message in get_flashed_messages() %}
     <p>{{ message }}</p>
 {% endfor %}
 
-<h2>Add Student</h2>
+<h2>Search Result</h2>
 
-<form action="/add" method="POST">
-    <input type="text" name="name">
-    <button type="submit">Add</button>
-</form>
+{% if student %}
+    <p>ID: {{ student[0] }}</p>
+    <p>Name: {{ student[1] }}</p>
+{% else %}
+    <p>No student found.<p>
+{% endif %}
 
-<h2>Search Student</h2>
-
-<form action="/search" method="GET">
-    <input type="text" name="name">
-    <button type="submit">Search</button>
-</form>
-
-<h2>Student List</h2>
-
-<table border="1">
-<tr>
-    <th>ID</th>
-    <th>Name</th>
-    <th>Action</th>
-</tr>
-
-{% for student in students %}
-<tr>
-    <td>{{ student[0] }}</td>
-    <td>{{ student[1] }}</td>
-    <td>
-        <a href="/delete/{{ student[0] }}">
-            Delete
-        </a>
-    </td>
-</tr>
-{% endfor %}
-
-</table>
+<a herf ="/">Back</a>
 
 </body>
 </html>

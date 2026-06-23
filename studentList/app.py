@@ -6,7 +6,7 @@ from flask import (
     url_for,
     flash
 )
-
+import logging
 from database import (
     initialize_database,
     listStudents,
@@ -36,55 +36,55 @@ def home():
         students=students
     )
 
-
-@app.route("/add", methods=["POST"])
-def add():
-
-    name = request.form.get("name", "").strip()
-
-    if not name:
-        flash("Name cannot be empty")
-        return redirect(url_for("home"))
+@app.route("/operation", methods=["POST"])
+def operation():
 
     try:
-        addStudent(name.capitalize())
-        flash("Student added successfully")
+        operation = request.form.get("operation")
+        name = request.form.get("name", "").strip()
 
+        if operation == "list":
+            students = listStudents()
+            return render_template (
+                "index.html",
+                students=students
+            )
+        
+        elif operation == "search":
+
+            if not name:
+                flash("Name cannot be empty.")
+                return redirect("/")
+            student = searchStudent(name)
+
+            if student:
+                flash(f"{name.capitalize()} fount.")
+            else:
+                flash(f"{name.capitalize()} not found.")
+        elif operation == "add":
+            if not name:
+                flash("Name cannot be empty.")
+                return redirect("/")
+            addStudent(name)
+            flash(f"{name.capitalize()} added successfully.")
+        elif operation == "delete":
+            if not name:
+                flash("Name cannot be empty.")
+                return redirect("/")
+            removed = delStudent(name)
+
+            if removed:
+                flash(f"{name.capitalize()} removed successfully")
+            else:
+                flash(f"{name.capitalize()} not found.")
     except Exception as e:
+        logging.exception(e)
         flash(str(e))
 
-    return redirect(url_for("home"))
+    return redirect("/")      
 
 
-@app.route("/search")
-def search():
 
-    name = request.args.get("name", "").strip()
-
-    if not name:
-        flash("Name cannot be empty")
-        return redirect(url_for("home"))
-
-    student = searchStudent(name.capitalize())
-
-    return render_template(
-        "search_result.html",
-        student=student,
-        search_term=name
-    )
-
-
-@app.route("/delete/<int:student_id>")
-def delete(student_id):
-
-    try:
-        delStudent(student_id)
-        flash("Student deleted successfully")
-
-    except Exception as e:
-        flash(str(e))
-
-    return redirect(url_for("home"))
 
 
 @app.errorhandler(404)
