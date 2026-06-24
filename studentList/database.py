@@ -29,7 +29,7 @@ def listStudents():
 def searchStudent(name):
         conn = connect()
         result = conn.execute("SELECT * FROM students WHERE name=?",(name,)
-        ).fetchall()
+        ).fetchone()
         conn.close()
         return result
 

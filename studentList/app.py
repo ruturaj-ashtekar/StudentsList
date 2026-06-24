@@ -1,12 +1,6 @@
-from flask import (
-    Flask,
-    render_template,
-    request,
-    redirect,
-    url_for,
-    flash
-)
+from flask import Flask, jsonify, request
 import logging
+
 from database import (
     initialize_database,
     listStudents,
@@ -21,81 +15,68 @@ app.secret_key = "student_secret"
 initialize_database()
 
 
-@app.route("/")
-def home():
+@app.route('/')
+def StudentPortal():
+    return "Student Listing Portal"
 
+@app.route('/listStudents')
+def listAll():
+    students = listStudents()
+    return jsonify({
+        "students": [
+            {
+                "id": student["id"],
+                "name": student["name"]
+            }
+            for student in students
+        ]
+    })
+
+@app.route('/addStd', methods=["POST"])
+def add_students():
     try:
-        students = listStudents()
+        data = request.get_json()
+        name = data.get('name')
 
+        if not name:
+            return jsonify({
+                'success':False,
+                'message': "Name is required"
+            }),400
+        addStudent(name)
+
+        return jsonify({
+            "success":True,
+            "message":f"{name} added successfully"
+        }), 201
     except Exception as e:
-        flash(f"Error loading students: {e}")
-        students = []
+        return jsonify({
+            "success":False,
+            "error":str(e)
+        }),500
 
-    return render_template(
-        "index.html",
-        students=students
-    )
+@app.route('/searchStd/', methods=["GET"])
+def searchStd():
+    student_name = request.args.get('name')
+    student_id = request.args.get('id')
+    
+    if student_id:
+        student = searchStudent(student_id)
+    elif student_name :
+        student = searchStudent(student_name)
+    else:
+        return jsonify({
+            "error":"provide id or name"
+        }),400
+    if not student:
+        return jsonify({
+            "error":"Student not found"
+        }),404
+    return jsonify({
+        "id": student["id"],
+        "name":student["name"]
+    })
 
-@app.route("/operation", methods=["POST"])
-def operation():
-
-    try:
-        operation = request.form.get("operation")
-        name = request.form.get("name", "").strip()
-
-        if operation == "list":
-            students = listStudents()
-            return render_template (
-                "index.html",
-                students=students
-            )
-        
-        elif operation == "search":
-
-            if not name:
-                flash("Name cannot be empty.")
-                return redirect("/")
-            student = searchStudent(name)
-
-            if student:
-                flash(f"{name.capitalize()} fount.")
-            else:
-                flash(f"{name.capitalize()} not found.")
-        elif operation == "add":
-            if not name:
-                flash("Name cannot be empty.")
-                return redirect("/")
-            addStudent(name)
-            flash(f"{name.capitalize()} added successfully.")
-        elif operation == "delete":
-            if not name:
-                flash("Name cannot be empty.")
-                return redirect("/")
-            removed = delStudent(name)
-
-            if removed:
-                flash(f"{name.capitalize()} removed successfully")
-            else:
-                flash(f"{name.capitalize()} not found.")
-    except Exception as e:
-        logging.exception(e)
-        flash(str(e))
-
-    return redirect("/")      
-
-
-
-
-
-@app.errorhandler(404)
-def page_not_found(error):
-    return render_template("404.html"), 404
-
-
-@app.errorhandler(500)
-def server_error(error):
-    return render_template("500.html"), 500
-
-
+    
 if __name__ == "__main__":
     app.run(debug=True)
