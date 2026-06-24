@@ -33,3 +33,13 @@
  * Running on http://127.0.0.1:5000
  * Running on http://192.168.0.101:5000
 2026-06-18 18:56:39,507 - INFO - [33mPress CTRL+C to quit[0m
+2026-06-23 22:15:26,456 - INFO - name: {name} is added to the List/DB
+2026-06-23 22:16:07,190 - INFO - name: {name} is added to the List/DB
+2026-06-23 22:16:09,746 - INFO - name: {name} is added to the List/DB
+2026-06-23 22:16:12,515 - INFO - name: {name} is added to the List/DB
+2026-06-23 22:16:15,464 - INFO - name: {name} is added to the List/DB
+2026-06-23 22:16:28,576 - INFO - name:Pqr was searched
+2026-06-23 22:17:30,001 - WARNING - Duplicate student attempted: Pqr
+2026-06-23 22:17:44,844 - INFO - name: {name} is added to the List/DB
+2026-06-23 22:18:00,573 - INFO - name:Tejas was searched
+2026-06-23 22:18:15,379 - INFO - name:Pqr srt tejas was searched

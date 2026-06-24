@@ -1,9 +1,6 @@
 import sqlite3
 import logging
-from flask import Flask
-
-
-
+# from flask import Flask
 
 
 logging.basicConfig(
@@ -11,15 +8,13 @@ logging.basicConfig(
     level = logging.INFO,
     format = '%(asctime)s - %(levelname)s - %(message)s'
 )
-
-
-
+# Functionality to log every event occured in the application
 try:
     conn = sqlite3.connect('students.db')
     cursor = conn.cursor()
 except sqlite3.Error as e:
     print("failed to connect \nOccuring Error: {e}")
-
+# Database conncetion for the application (sqlite3) 
 
 cursor.execute("""
     CREATE TABLE IF NOT EXISTS students(
@@ -28,10 +23,10 @@ cursor.execute("""
 )
 """)
 conn.commit()
+#creating table (students) in the database to store student's name
 
-
-def studentList():
-    def listStudents():
+def studentList(): # single function storing other operationa funcions
+    def listStudents(): # Listing The Students
         print('\nStudent list:')
         
         try:    
@@ -49,7 +44,7 @@ def studentList():
         for index, (name,)in  enumerate(students, start = 1):
             print(f"{index}. {name}")
 
-    def searchStudents():
+    def searchStudents(): # Searching a student
         try: 
             while True:
                 search = input('\nEnter the name of the student to search: ').strip()
@@ -77,7 +72,7 @@ def studentList():
         except KeyboardInterrupt:
             studentList()
 
-    def addStudents():
+    def addStudents(): #Adding a student
         try: 
             while True:
                 nameAdd = input('\nEnter the name of the student: ').strip()
@@ -107,7 +102,7 @@ def studentList():
         except KeyboardInterrupt:
             studentList()
 
-    def removeStudents():
+    def removeStudents(): # Removing a Students
         try:
             while True:
                 toRemove = input('\nEnter the name of the student to remove: ').strip()
@@ -150,6 +145,7 @@ def studentList():
             )
             print(menu)
             userInput = input('Choose an option: ').strip()
+            '''Menu for user'''
 
             if userInput == '1':
                 listStudents()
@@ -167,7 +163,7 @@ def studentList():
                 print('Invalid option. Please try again.')
     except KeyboardInterrupt:
         print('\nexited!')
-
+        # opetion selection
 
 if __name__ == '__main__':
     studentList()
