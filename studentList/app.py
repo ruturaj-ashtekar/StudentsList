@@ -6,7 +6,9 @@ from database import (
     listStudents,
     addStudent,
     searchStudent,
-    delStudent
+    searchStudentById,
+    delStudent,
+    delStudentById
 )
 
 app = Flask(__name__)
@@ -61,7 +63,7 @@ def searchStd():
     student_id = request.args.get('id')
     
     if student_id:
-        student = searchStudent(student_id)
+        student = searchStudentById(student_id)
     elif student_name :
         student = searchStudent(student_name)
     else:
@@ -77,6 +79,26 @@ def searchStd():
         "name":student["name"]
     })
 
+@app.route('/deleteStd/', methods=['DELETE'])
+def delStd():
+    student_name = request.args.get('name')
+    student_id = request.args.get('id')
+    if student_id:
+        deleted = delStudentById(student_id)
+    elif student_name:
+        deleted = delStudent(student_name)
+    
+    else:
+        return jsonify({
+            'error': "name or id is required"
+        }),400
+    if not deleted:
+        return jsonify({
+            'message': "Student not found"
+        }),404
+    return jsonify({
+        "message":"Student deleted successfully"
+    }),200
     
 if __name__ == "__main__":
     app.run(debug=True)

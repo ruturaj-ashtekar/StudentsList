@@ -33,6 +33,13 @@ def searchStudent(name):
         conn.close()
         return result
 
+def searchStudentById(student_id):
+        conn = connect()
+        result = conn.execute("SELECT * FROM students WHERE id=?",(student_id,)
+        ).fetchone()
+        conn.close()
+        return result
+
 def addStudent(name):
       conn = connect()
       conn.execute(
@@ -51,4 +58,12 @@ def delStudent(name):
     conn.commit()
     conn.close()
     
+def delStudentById(id):
+    conn = connect()
+    conn.execute(
+            "DELETE FROM students WHERE id=?",
+            (id,)
+      )
+    conn.commit()
+    conn.close()
     
